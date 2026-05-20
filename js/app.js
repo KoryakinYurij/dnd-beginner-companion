@@ -46,10 +46,8 @@ function handleScreenNavigation(screenName) {
  * Подписки компонентов на изменение состояния (точечный ре-рендер).
  */
 function setupSubscriptions() {
-  console.log('[setupSubscriptions] called');
   // Подписка на смену экранов
   subscribe('currentScreen', (screenName, fullState) => {
-    console.log('[currentScreen subscriber] called with:', screenName);
     navigate(screenName);
     
     // При переходе на экран запускаем первичный рендер этого экрана

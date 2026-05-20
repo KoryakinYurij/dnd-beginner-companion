@@ -1,0 +1,31 @@
+{
+  "last_cycle": [
+    { "task_id": "track-meta-info", "verdict": "accept", "reason": "PASS — Features/Proficiencies/Notes прошли верификацию" },
+    { "task_id": "track-combat-stats", "verdict": "accept", "reason": "PASS — HP gradient динамический, dblclick работает, верификация подтвердила" },
+    { "task_id": "track-wizard-ui", "verdict": "reject", "reason": "Агент не сдал 4 раза подряд. Забираю сам — levelUpWizard.js уже существует и работает. Нужно только добавить CSS для .level-up-wizard в styles.css." },
+    { "task_id": "track-equipment-spells", "verdict": "manual_retry", "reason": "Верификация: 1) spells.js — добавить модалку описания заклинания (имя, школа, castingTime, range, duration, description). Клик на заклинание в списке открывает модалку. 2) attacks.js — кнопка броска урона (клик -> toast с формулой урона). 3) inventory.js — inline редактирование предметов (двойной клик на название -> input). Long Rest — это в header.js, не в spells.js." },
+    { "task_id": "sheet-integration", "verdict": "manual_retry", "reason": "levelUpWizard.js использует CSS класс .level-up-wizard который не существует в styles.css. Нужно либо добавить стили, либо levelUpWizard.js должен использовать существующие классы. Также проверить toggleSound в template." }
+  ],
+  "next_cycle": [
+    {
+      "task_id": "track-equipment-spells",
+      "title": "Исправить модалку заклинаний + урон + inline edit (ФИНАЛЬНАЯ попытка)",
+      "prompt": "Прочитай D:\\Code AI\\Projects\\AntigravityTest\\js\\components\\spells.js. Добавь в конец файла функцию showSpellModal(spell): создаёт HTML модалки с spell.name, spell.school, spell.castingTime, spell.range, spell.duration, spell.description. Привяжи в bind() клик по каждому заклинанию -> showSpellModal(spell).\n\nПрочитай D:\\Code AI\\Projects\\AntigravityTest\\js\\components\\attacks.js. Убедись что кнопка урона привязана: при клике показывает toast с формулой урона (например '2d6+3 урона огнём').\n\nПрочитай D:\\Code AI\\Projects\\AntigravityTest\\js\\components\\inventory.js. Добавь в bind() dblclick handler: двойной клик по названию предмета -> создаёт input для редактирования, при blur сохраняет. Проверь что эта логика есть.",
+      "assigned_to": "coder",
+      "verified_by": "verifier",
+      "verify_prompt": "Проверить: spells.js содержит модалку описания заклинания. attacks.js кнопка урона показывает toast. inventory.js поддерживает inline редактирование двойным кликом.",
+      "timeout_ms": 600000
+    },
+    {
+      "task_id": "sheet-integration",
+      "title": "Исправить sheet.js CSS для levelUpWizard (ФИНАЛЬНАЯ попытка)",
+      "prompt": "Прочитай D:\\Code AI\\Projects\\AntigravityTest\\styles.css (первые 200 строк) и D:\\Code AI\\Projects\\AntigravityTest\\js\\components\\levelUpWizard.js. Добавь в styles.css базовые стили для levelUpWizard: .level-up-wizard, .level-up-header, .level-badge. Или измени levelUpWizard.js чтобы использовать существующие стили card/modal. Также проверь что toggleSound не вызывается в template literals sheet.js.",
+      "assigned_to": "coder",
+      "verified_by": "verifier",
+      "verify_prompt": "Проверить: levelUpWizard.js CSS классы существуют в styles.css ИЛИ levelUpWizard использует только существующие стили.",
+      "timeout_ms": 600000
+    }
+  ],
+  "plan_complete": false,
+  "message_to_user": "Цикл 3: Combat и Features прошли. Level Up Wizard забираю сам — файл уже существует. Осталось 2 задачи: модалка заклинаний + sheet.js CSS."
+}

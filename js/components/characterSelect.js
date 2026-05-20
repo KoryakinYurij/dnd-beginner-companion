@@ -91,14 +91,10 @@ export function render(state) {
  * @param {HTMLElement} container - Контейнер экрана.
  */
 export function bind(container) {
-  console.log('[characterSelect.bind] container:', container);
-  
   // Кнопка создания нового персонажа
   const btnNew = $('#btn-new-character', container);
-  console.log('[characterSelect.bind] btnNew:', btnNew);
   if (btnNew) {
     btnNew.addEventListener('click', () => {
-      console.log('[characterSelect] button clicked! Setting state...');
       // Инициализируем пустые временные данные создания
       setState({ 
         wizardData: {

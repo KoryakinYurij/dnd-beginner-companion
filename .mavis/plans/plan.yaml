@@ -1,0 +1,290 @@
+version: 1
+plan:
+  name: 'D&D Помощник — UI компоненты листа персонажа'
+  max_concurrency: 5
+  max_consecutive_failures: 2
+  max_cycles: 10
+
+tasks:
+  - id: track-wizard-ui
+    title: 'Level Up Wizard, Header и Help Tooltips'
+    prompt: |
+      Создайте три JS файла в D:\Code AI\Projects\AntigravityTest\js\components\
+
+      ## 1. levelUpWizard.js
+      Мини-визард повышения уровня (открывается в модальном окне). Паттерн render/bind как в wizard.js.
+
+      Шаги:
+      1. HP: "Бросить dX" (анимация) ИЛИ "Взять среднее". Показывает diff: oldHP -> newHP.
+      2. Новые черты класса: список фич нового уровня с иконкой и описанием.
+      3. ASI (уровни 4,8,12,16,19): выбор "+2 к одной характеристике" или "+1 к двум".
+      4. Заклинания (только заклинатели): новые ячейки, выбор заклинаний.
+      5. Diff-экран: таблица "Было -> Стало" (HP, prof bonus, ability modifiers). Изменения зелёные.
+      Кнопка "Подтвердить" -> обновление персонажа -> закрытие модалки -> конфетти.
+
+      Импортировать из '../rules/index.js': getModifier, getProficiencyBonus, getLevelUpHP, CLASSES_DATA, SPELLS_DATA
+      Импортировать из '../state.js': setState, getState, saveCharacter, getActiveCharacter
+      Импортировать из '../dice.js': roll, playDiceSound
+      Импортировать из '../utils.js': $, $$, escapeHtml
+      Импортировать triggerConfetti из '../app.js'
+
+      ## 2. header.js
+      Шапка персонажа на листе:
+      - Имя (редактируемое по клику - inline edit)
+      - Раса + Класс + Уровень
+      - XP-бар с прогрессом до следующего уровня (Milestone/XP переключатель)
+      - Кнопка Level Up (пульсирует золотым когда XP достаточно)
+      - Кнопки "Длинный отдых" / "Короткий отдых"
+      - Звезда Вдохновение (кликабельная, заполненная = активно)
+
+      Функции отдыха:
+      - Длинный отдых: HP -> max, все ячейки заклинаний восстановлены, death saves сброшены
+      - Короткий отдых: модалка "Сколько костей хитов потратить?" с кнопками
+
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../utils.js': $, $$, formatXP, escapeHtml
+      Импортировать из '../rules/index.js': XP_TABLE, getXPForNextLevel, getModifier, CLASSES_DATA
+
+      ## 3. helpTooltip.js
+      Переиспользуемый компонент контекстных подсказок:
+      - Экспорт функции renderHelpIcon(tooltipId, text) -> возвращает HTML '<span class="help-icon">?</span>'
+      - При ховере показывает пузырь с tooltipText
+      - Глобальный переключатель showHelp из state.js управляет видимостью
+      - Все тексты тултипов на русском языке
+
+      Общие правила:
+      - render() возвращает строку HTML, bind() привязывает обработчики
+      - Все данные берём из getActiveCharacter()
+      - Использовать стили из styles.css: card, section-title-parchment, btn-primary, btn-glow-gold, etc.
+      - Данные на русском языке, D&D термины на английском в скобках (STR, AC, HP)
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: |
+      Проверить что все три файла созданы, компилируются без ошибок, используют корректные импорты.
+      Проверить: levelUpWizard содержит 5 шагов, header содержит XP-бар и кнопки отдыха, helpTooltip экспортирует функцию.
+    timeout_ms: 1800000
+
+  - id: track-combat-stats
+    title: 'Combat, Abilities и Skills компоненты'
+    prompt: |
+      Создайте три JS файла в D:\Code AI\Projects\AntigravityTest\js\components\
+
+      ## 1. combat.js
+      Боевой блок персонажа:
+      - HP-бар: градиентная полоса (зелёный->жёлтый->красный), числа current/max. Кнопки +/- для изменения HP. Поле "Временные HP". Тултип на ? объясняет HP.
+      - AC (Класс Брони): авто-расчёт из DEX mod + экипированная броня, с ручным переопределением. Тултип.
+      - Инициатива: модификатор DEX, клик -> бросок d20 + DEX mod.
+      - Скорость: из данных расы (race.speed).
+      - Кости хитов (Hit Dice): визуальные пипки (O/P). Показывают доступные/потраченные. Клик -> бросок.
+      - Death Saves (Спасброски от смерти): 3 зелёных + 3 красных кружка. Появляются только когда HP=0. Кнопка "Бросить" -> d20: >=10 = успех, <10 = провал.
+      - Conditions (Состояния): ряд бейджей. 15 состояний из conditions.js. Клик = toggle active/inactive. Активные подсвечены.
+
+      Импортировать из '../rules/index.js': CONDITIONS_DATA, getModifier, getProficiencyBonus
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../dice.js': roll, rollWithMod, playDiceSound, diceShake
+      Импортировать из '../utils.js': $, $$, formatModifier
+
+      ## 2. abilities.js
+      6 карточек характеристик в сетке:
+      - STR, DEX, CON, INT, WIS, CHA - русское название + (EN abbreviation)
+      - Значение (крупно) + модификатор (+-N, очень крупно)
+      - Клик -> бросок проверки характеристики (d20 + modifier). Показывает toast.
+      - Режим редактирования: клик на число -> поле ввода (для ASI).
+      - Тултип на ? объясняет что делает характеристика.
+
+      Импортировать из '../state.js': getState, getActiveCharacter, saveCharacter
+      Импортировать из '../rules/index.js': getModifier
+      Импортировать из '../dice.js': rollWithMod, playDiceSound
+      Импортировать из '../utils.js': $, $$, formatModifier, escapeHtml
+
+      ## 3. skills.js
+      Два блока:
+      - Saving Throws (Спасброски): 6 строк. Заполненный кружок = владение. Модификатор. Клик -> бросок.
+      - Skills (Навыки): 18 строк. Кружок владения, название (рус. + англ.), модификатор, клик -> бросок.
+      - Формула: владение -> ability_mod + prof_bonus, нет -> ability_mod
+      - Passive Perception (Пассивное Восприятие): 10 + WIS mod + proficiency (если владеет Восприятие)
+
+      Импортировать из '../rules/index.js': getModifier, getProficiencyBonus, SKILLS_DATA
+      Импортировать из '../state.js': getState, getActiveCharacter
+      Импортировать из '../dice.js': rollWithMod, playDiceSound
+      Импортировать из '../utils.js': $, $$, formatModifier
+
+      Общие правила:
+      - render() возвращает HTML строку, bind() привязывает обработчики
+      - Данные персонажа: getActiveCharacter()
+      - Все описания на русском, D&D термины на английском
+      - Использовать стили из styles.css: stat-hex, card, hp-bar, death-pips, condition-badge, etc.
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: |
+      Проверить что все три файла созданы, компилируются, импорты корректны.
+      Проверить: combat содержит HP-бар, AC, инициативу, death saves, conditions; abilities содержит 6 карточек; skills содержит спасброски и навыки.
+    timeout_ms: 1800000
+
+  - id: track-equipment-spells
+    title: 'Attacks, Inventory и Spells компоненты'
+    prompt: |
+      Создайте три JS файла в D:\Code AI\Projects\AntigravityTest\js\components\
+
+      ## 1. attacks.js
+      Атаки и оружие:
+      - Список атак: название, бонус атаки (клик -> d20 + бонус), урон (клик -> бросок урона), тип урона
+      - Клик на бонус -> тост "Атака: d20 + N = результат"
+      - Клик на урон -> тост "Урон: 2d6+3 = результат"
+      - "Добавить атаку" -> выбор из WEAPONS_DATA или ручной ввод
+      - Авто-расчёт бонуса атаки = prof_bonus + STR/DEX mod (в зависимости от свойств)
+      - Возможность редактировать/удалять атаки
+
+      Импортировать из '../rules/index.js': WEAPONS_DATA, getModifier, getProficiencyBonus
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../dice.js': roll, rollWithMod, playDiceSound
+      Импортировать из '../utils.js': $, $$, $$$
+
+      ## 2. inventory.js
+      Инвентарь персонажа:
+      - Список предметов: название, количество, вес, заметка
+      - Inline-редактирование (добавление/редактирование/удаление)
+      - Валюта: ММ (cp), СМ (sp), ЗМ (gp) - упрощённая система
+      - Общий вес + предупреждение о перегрузке (если > STR * 15)
+      - Кнопка "Добавить предмет"
+
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../utils.js': $, $$
+
+      ## 3. spells.js
+      Система заклинаний:
+      - Spell Slots (Ячейки заклинаний): визуальные пузырьки по уровням (1-4). Клик = потрачена (●). Длинный отдых восстанавливает.
+      - Spell DC и Spell Attack: вычисляются из INT/WIS/CHA модификатора
+      - Список заклинаний: сгруппированы по уровню (Заговоры, 1-й круг...). Клик -> модалка с полным описанием.
+      - "Добавить заклинание" -> выпадающий список, фильтрованный по классу персонажа
+      - Для не-заклинателей: сообщение "Ваш класс не использует заклинания"
+
+      Импортировать из '../rules/index.js': SPELLS_DATA, getModifier, CLASSES_DATA
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../utils.js': $, $$, escapeHtml
+
+      Общие правила:
+      - render() возвращает HTML, bind() привязывает обработчики
+      - Данные из getActiveCharacter()
+      - Вкладки (tabs): attacks, inventory, spells - управляются через state.activeTab
+      - Все описания на русском
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: |
+      Проверить что все три файла созданы, компилируются, импорты корректны.
+      Проверить: attacks содержит список атак и добавление; inventory содержит предметы и валюту; spells содержит ячейки и список заклинаний.
+    timeout_ms: 1800000
+
+  - id: track-meta-info
+    title: 'Features, Proficiencies и Notes компоненты'
+    prompt: |
+      Создайте три JS файла в D:\Code AI\Projects\AntigravityTest\js\components\
+
+      ## 1. features.js
+      Черты персонажа:
+      - Автоматически собирается из фич класса (CLASSES_DATA[класс].features[уровень]) + трейтов расы + черты предыстории
+      - Каждая фича: название (рус./англ.), источник (Класс/Раса/Предыстория), описание
+      - Аккордеон (сворачиваемый) для удобочитаемости
+      - Заблокированные фичи будущих уровней показаны серым: "Откроется на уровне X"
+      - Фильтр: "Все" | "Класс" | "Раса" | "Предыстория"
+
+      Импортировать из '../rules/index.js': CLASSES_DATA, RACES_DATA, BACKGROUNDS_DATA
+      Импортировать из '../state.js': getState, getActiveCharacter
+      Импортировать из '../utils.js': $, $$
+
+      ## 2. proficiencies.js
+      Владения персонажа:
+      Компактная секция с 4 категориями (цветные чипы/бейджи):
+      - Броня: из класса (Лёгкая, Средняя, Тяжёлая, Щиты)
+      - Оружие: из класса (Простое, Воинское, конкретные виды)
+      - Инструменты: из класса + предыстории
+      - Языки: из расы + предыстории (Общий, Эльфийский...)
+
+      Импортировать из '../state.js': getState, getActiveCharacter
+      Импортировать из '../rules/index.js': CLASSES_DATA, RACES_DATA, BACKGROUNDS_DATA
+
+      ## 3. notes.js
+      Журнал заметок:
+      - Textarea с автоподстройкой высоты (не contenteditable)
+      - 4 предустановленных секции: "Заметки сессии", "NPC", "Квесты", "Добыча"
+      - Кнопка "+ Добавить секцию" для пользовательских секций
+      - Авто-сохранение при каждом изменении (debounced 500ms) через state + saveCharacter
+
+      Импортировать из '../state.js': setState, getState, getActiveCharacter, saveCharacter
+      Импортировать из '../utils.js': $, $$, debounce
+
+      Общие правила:
+      - render() возвращает HTML, bind() привязывает обработчики
+      - Данные из getActiveCharacter()
+      - Все описания на русском
+      - Использовать стили из styles.css: accordion, chip, badge, etc.
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: |
+      Проверить что все три файла созданы, компилируются, импорты корректны.
+      Проверить: features содержит аккордеон с фичами; proficiencies содержит 4 категории владений; notes содержит textarea и секции.
+    timeout_ms: 1800000
+
+  - id: sheet-integration
+    title: 'Sheet.js - главный макет листа персонажа'
+    prompt: |
+      Создайте файл D:\Code AI\Projects\AntigravityTest\js\components\sheet.js
+
+      Главный макет листа персонажа - собирает все под-компоненты в CSS Grid.
+
+      ## Структура сетки:
+      - Header (имя, раса, класс, уровень, XP, звезда Вдохновения, кнопки отдыха)
+      - Abilities (6 карточек характеристик)
+      - Combat (HP, AC, Инициатива, Скорость, Hit Dice, Death Saves, Conditions)
+      - Skills (Спасброски + Навыки + Passive Perception)
+      - Вкладки внизу: Attacks | Inventory | Spells | Features | Notes
+      - Правый сайдбар: Dice Roller (d4-d20) + Roll Log
+
+      ## Компоненты для импорта:
+      import * as header from './header.js';
+      import * as combat from './combat.js';
+      import * as abilities from './abilities.js';
+      import * as skills from './skills.js';
+      import * as attacks from './attacks.js';
+      import * as inventory from './inventory.js';
+      import * as spells from './spells.js';
+      import * as features from './features.js';
+      import * as proficiencies from './proficiencies.js';
+      import * as notes from './notes.js';
+      import * as levelUpWizard from './levelUpWizard.js';
+
+      ## Функции:
+      - render(state): собирает HTML из всех компонентов. Возвращает полный layout листа.
+      - bind(container): привязывает обработчики для вкладок (activeTab), кнопку Level Up (открывает levelUpWizard модалку), кнопку "Назад к персонажам".
+
+      ## Вкладки:
+      - state.activeTab управляет какая вкладка видна (attacks/inventory/spells/features/notes)
+      - Клик по вкладке -> setState({ activeTab: '...' })
+
+      ## Кнопка Level Up:
+      - Проверяет достаточно ли XP для повышения (через XP_TABLE)
+      - Если достаточно или isMilestone=true -> пульсирует золотым
+      - Клик -> levelUpWizard.open() - показывает модалку
+
+      ## Dice Roller (правый сайдбар):
+      - Кнопки: d4, d6, d8, d10, d12, d20 (с иконками кубиков)
+      - Клик -> анимация броска + toast с результатом
+      - Roll Log: последние 10 бросков с временем
+
+      Импортировать из '../state.js': setState, getState, getActiveCharacter
+      Импортировать из '../utils.js': $, $$
+      Импортировать из '../dice.js': roll, rollWithMod, playDiceSound, toggleSound
+      Импортировать из '../rules/index.js': XP_TABLE, getModifier
+
+      ## Стилизация:
+      Использовать CSS Grid для layout. Все подкомпоненты рендерятся через их render() функции.
+
+      ВАЖНО: sheet.js уже ЧАСТИЧНО существует. Проверьте файл. Если он содержит только placeholder (пустой render), замените на полную реализацию. Если уже что-то есть - расширьте, не удаляйте существующее.
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: |
+      Проверить что sheet.js создан/обновлён, содержит CSS Grid layout с header, abilities, combat, skills, вкладками, dice roller.
+      Проверить что все импорты корректны и файл компилируется.
+      Проверить что Level Up кнопка привязана к levelUpWizard.open().
+      Не удалять существующий код, только добавлять/расширять.
+    timeout_ms: 1800000

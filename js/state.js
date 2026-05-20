@@ -109,10 +109,8 @@ const subscribers = {};
 export function subscribe(key, callback) {
   if (!subscribers[key]) {
     subscribers[key] = [];
-    console.log('[subscribe] created new subscriber list for:', key);
   }
   subscribers[key].push(callback);
-  console.log('[subscribe] registered for:', key, 'total:', subscribers[key].length);
 }
 
 /**
@@ -130,13 +128,9 @@ export function setState(patch) {
     }
   });
   
-  // DEBUG: логируем что изменилось
-  console.log('[setState] changed:', affectedKeys);
-  
   // Запуск подписчиков для изменённых ключей
   affectedKeys.forEach(key => {
     if (subscribers[key]) {
-      console.log('[setState] calling subscribers for:', key, 'count:', subscribers[key].length);
       subscribers[key].forEach(callback => callback(state[key], state));
     }
   });
