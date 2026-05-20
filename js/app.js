@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setState({ currentScreen: 'home' });
   }
 
+  // 3.1 Гарантируем первичный рендер/биндинг даже если экран не изменился
+  renderScreen(getState().currentScreen, getState());
+
   // 4. Инициализация глобальных UI обработчиков событий
   setupGlobalEvents();
 });
@@ -49,23 +52,7 @@ function setupSubscriptions() {
   // Подписка на смену экранов
   subscribe('currentScreen', (screenName, fullState) => {
     navigate(screenName);
-    
-    // При переходе на экран запускаем первичный рендер этого экрана
-    if (screenName === 'home') {
-      const container = $('#screen-home');
-      container.innerHTML = characterSelect.render(fullState);
-      characterSelect.bind(container);
-    } 
-    else if (screenName === 'wizard') {
-      const container = $('#screen-wizard');
-      container.innerHTML = wizard.render(fullState);
-      wizard.bind(container);
-    } 
-    else if (screenName === 'sheet') {
-      const container = $('#screen-sheet');
-      container.innerHTML = sheet.render(fullState);
-      sheet.bind(container);
-    }
+    renderScreen(screenName, fullState);
   });
 
   // Подписка на обновление персонажей (перерендер списка на главной)
@@ -92,6 +79,29 @@ function setupSubscriptions() {
       sheet.bind(container);
     }
   });
+}
+
+/**
+ * Рендер и привязка обработчиков для конкретного экрана.
+ * @param {string} screenName - Имя экрана.
+ * @param {Object} fullState - Глобальное состояние.
+ */
+function renderScreen(screenName, fullState) {
+  if (screenName === 'home') {
+    const container = $('#screen-home');
+    container.innerHTML = characterSelect.render(fullState);
+    characterSelect.bind(container);
+  } 
+  else if (screenName === 'wizard') {
+    const container = $('#screen-wizard');
+    container.innerHTML = wizard.render(fullState);
+    wizard.bind(container);
+  } 
+  else if (screenName === 'sheet') {
+    const container = $('#screen-sheet');
+    container.innerHTML = sheet.render(fullState);
+    sheet.bind(container);
+  }
 }
 
 /**
