@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D&D 5e Помощник Новичка</title>
+  
+  <!-- Подключение Google Fonts: Cinzel (D&D стиль) и Inter (читаемый UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Основные стили -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Глобальные звуковые настройки -->
+    <div class="sound-toggle-container" id="sound-control">
+      <button id="btn-sound-toggle" class="btn-icon" title="Включить/выключить звук броска">🔊</button>
+      <button id="btn-help-toggle" class="btn-icon" title="Скрыть/показать всплывающие подсказки для новичков">❓</button>
+    </div>
+
+    <!-- ЭКРАН 1: Главная / Выбор персонажа -->
+    <div id="screen-home" class="screen active">
+      <div class="home-container">
+        <header class="home-header">
+          <h1 class="logo-title">DnD Помощник</h1>
+          <p class="logo-subtitle">Твой идеальный проводник в мир Dungeons &amp; Dragons</p>
+        </header>
+        
+        <div class="character-select-hub">
+          <div class="characters-grid-wrapper">
+            <h2 class="section-title-parchment">Твои Герои</h2>
+            <div id="characters-grid" class="characters-grid">
+              <!-- Карточки персонажей рендерятся из JS -->
+            </div>
+          </div>
+          
+          <div class="home-actions">
+            <button id="btn-new-character" class="btn-glow-gold">⚔️ Создать Нового Героя</button>
+            <label class="btn-secondary-custom" for="input-import-char">
+              📥 Импортировать Персонажа (.json)
+            </label>
+            <input type="file" id="input-import-char" accept=".json" style="display: none;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ЭКРАН 2: Пошаговый Мастер Создания Персонажа -->
+    <div id="screen-wizard" class="screen">
+      <!-- Контент полностью рендерится динамически в js/components/wizard.js -->
+    </div>
+
+    <!-- ЭКРАН 3: Лист Персонажа / Игровой Дашборд -->
+    <div id="screen-sheet" class="screen">
+      <!-- Контент полностью рендерится динамически в js/components/sheet.js -->
+    </div>
+
+    <!-- Модальное окно (Level Up, Броски костей короткого отдыха, Спеллы детально) -->
+    <div id="modal-overlay" class="modal-overlay">
+      <div class="modal-content" id="modal-content">
+        <!-- Заполняется динамически -->
+      </div>
+    </div>
+
+    <!-- Контейнер для Тостов (Результаты бросков) -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Контейнер для конфетти -->
+    <div id="confetti-container" class="confetti-container"></div>
+  </div>
+
+  <!-- Главный скрипт веб-приложения как ES6 Модуль -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

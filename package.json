@@ -1,0 +1,16 @@
+{
+  "name": "dnd-beginner-companion",
+  "version": "1.0.0",
+  "description": "SOTA D&D 5e Beginner Companion & Character Sheet Builder",
+  "scripts": {
+    "dev": "npx -y serve ."
+  },
+  "keywords": [
+    "dnd",
+    "dnd5e",
+    "character-sheet",
+    "beginner-friendly"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
