@@ -3,7 +3,7 @@
    ========================================================================== */
 
 import { getActiveCharacter, getState, setState } from '../state.js';
-import { $, $$ } from '../utils.js';
+import { $, $$, formatModifier } from '../utils.js';
 import { getModifier, getProficiencyBonus } from '../rules/index.js';
 import { rollWithMod } from '../dice.js';
 
@@ -155,15 +155,4 @@ function updateAbility(ability, value) {
     c.id === character.id ? { ...c, abilities } : c
   );
   setState({ characters: updatedChars });
-}
-
-/**
- * Вспомогательная функция для форматирования модификатора.
- * @param {number} n - Число.
- * @returns {string}
- */
-function formatModifier(n) {
-  if (n > 0) return `+${n}`;
-  if (n === 0) return '0';
-  return `${n}`;
 }
