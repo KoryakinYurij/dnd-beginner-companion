@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "SOTA D&D 5e Beginner Companion & Character Sheet Builder",
   "scripts": {
-    "dev": "npx -y serve ."
+    "dev": "npx -y serve .",
+    "test": "jest"
   },
   "keywords": [
     "dnd",
@@ -12,5 +13,11 @@
     "beginner-friendly"
   ],
   "author": "Antigravity",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2"
+  }
 }
