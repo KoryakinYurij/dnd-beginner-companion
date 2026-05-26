@@ -3,7 +3,7 @@
    ========================================================================== */
 
 import { getActiveCharacter, getState, setState } from '../state.js';
-import { $, $$, escapeHtml } from '../utils.js';
+import { $, $$, escapeHtml, formatModifier } from '../utils.js';
 import { getModifier, getProficiencyBonus, WEAPONS_DATA } from '../rules/index.js';
 import { rollWithMod, roll } from '../dice.js';
 
@@ -319,15 +319,4 @@ function addQuickWeapon(weaponName) {
     proficient: true,
     damage: weapon.damage
   });
-}
-
-/**
- * Форматирует модификатор.
- * @param {number} n - Число.
- * @returns {string}
- */
-function formatModifier(n) {
-  if (n > 0) return `+${n}`;
-  if (n === 0) return '0';
-  return `${n}`;
 }
