@@ -202,6 +202,7 @@ export function triggerConfetti() {
 
   const colors = ['#e5ba53', '#ff4d6d', '#3a86f5', '#06d6a0', '#9d4edd', '#f77f00'];
   const particleCount = 75;
+  const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement('div');
@@ -215,11 +216,13 @@ export function triggerConfetti() {
     particle.style.animationDuration = duration + 's';
     particle.style.animationDelay = Math.random() * 0.5 + 's';
 
-    container.appendChild(particle);
+    fragment.appendChild(particle);
 
     // Удаляем после анимации
     setTimeout(() => {
       particle.remove();
     }, (duration + 0.5) * 1000);
   }
+
+  container.appendChild(fragment);
 }
