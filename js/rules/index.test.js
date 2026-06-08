@@ -1,4 +1,11 @@
-import { calculateDefaultAC } from './index.js';
+import {
+  calculateDefaultAC,
+  getModifier,
+  getProficiencyBonus,
+  getXPForNextLevel,
+  getStartingHP,
+  getLevelUpHP
+} from './index.js';
 
 describe('calculateDefaultAC', () => {
   describe('Unarmored', () => {
@@ -101,5 +108,99 @@ describe('calculateDefaultAC', () => {
     it('handles undefined armor properly', () => {
       expect(calculateDefaultAC(2)).toBe(12);
     });
+  });
+});
+
+describe('getModifier', () => {
+  it('correctly calculates positive and negative modifiers', () => {
+    expect(getModifier(1)).toBe(-5);
+    expect(getModifier(8)).toBe(-1);
+    expect(getModifier(9)).toBe(-1);
+    expect(getModifier(10)).toBe(0);
+    expect(getModifier(11)).toBe(0);
+    expect(getModifier(12)).toBe(1);
+    expect(getModifier(15)).toBe(2);
+    expect(getModifier(20)).toBe(5);
+    expect(getModifier(30)).toBe(10);
+  });
+});
+
+describe('getProficiencyBonus', () => {
+  it('returns correct proficiency bonus for valid levels', () => {
+    expect(getProficiencyBonus(1)).toBe(2);
+    expect(getProficiencyBonus(4)).toBe(2);
+    expect(getProficiencyBonus(5)).toBe(3);
+    expect(getProficiencyBonus(8)).toBe(3);
+    expect(getProficiencyBonus(9)).toBe(4);
+    expect(getProficiencyBonus(12)).toBe(4);
+    expect(getProficiencyBonus(13)).toBe(5);
+    expect(getProficiencyBonus(16)).toBe(5);
+    expect(getProficiencyBonus(17)).toBe(6);
+    expect(getProficiencyBonus(20)).toBe(6);
+  });
+
+  it('handles edge cases (out of bounds levels)', () => {
+    expect(getProficiencyBonus(0)).toBe(2); // Should clamp to level 1
+    expect(getProficiencyBonus(-5)).toBe(2); // Should clamp to level 1
+    expect(getProficiencyBonus(25)).toBe(6); // Should clamp to level 20
+  });
+});
+
+describe('getXPForNextLevel', () => {
+  it('returns required XP for valid levels', () => {
+    expect(getXPForNextLevel(1)).toBe(300); // Index 1 is level 2 in XP_TABLE
+    expect(getXPForNextLevel(2)).toBe(900);
+    expect(getXPForNextLevel(19)).toBe(355000); // Index 19 is level 20
+  });
+
+  it('returns null for max level or above', () => {
+    expect(getXPForNextLevel(20)).toBeNull();
+    expect(getXPForNextLevel(25)).toBeNull();
+  });
+});
+
+describe('getStartingHP', () => {
+  it('calculates correct starting HP based on hitDie and CON mod', () => {
+    expect(getStartingHP(6, 0)).toBe(6);
+    expect(getStartingHP(8, 2)).toBe(10);
+    expect(getStartingHP(10, -1)).toBe(9);
+    expect(getStartingHP(12, 5)).toBe(17);
+  });
+});
+
+describe('getLevelUpHP', () => {
+  it('calculates average HP correctly', () => {
+    // hitDie / 2 + 1 + conMod
+    expect(getLevelUpHP(6, 0, true)).toBe(4); // 3 + 1 + 0
+    expect(getLevelUpHP(8, 2, true)).toBe(7); // 4 + 1 + 2
+    expect(getLevelUpHP(10, -1, true)).toBe(5); // 5 + 1 - 1
+    expect(getLevelUpHP(12, 5, true)).toBe(12); // 6 + 1 + 5
+  });
+
+  it('calculates random HP correctly', () => {
+    // Mock Math.random to always return 0.5 (middle of the die)
+    const mockMath = Object.create(global.Math);
+    mockMath.random = () => 0.5;
+    global.Math = mockMath;
+
+    // hitDie = 8 -> 0.5 * 8 = 4, floor(4) = 4, +1 = 5.
+    // 5 + 2 = 7
+    expect(getLevelUpHP(8, 2, false)).toBe(7);
+
+    // hitDie = 12 -> 0.5 * 12 = 6, floor(6) = 6, +1 = 7.
+    // 7 - 1 = 6
+    expect(getLevelUpHP(12, -1, false)).toBe(6);
+
+    // Test minimum 1 enforcement
+    mockMath.random = () => 0.01; // lowest roll = 1
+    // roll = 1, mod = -5 -> 1 - 5 = -4 -> should be 1
+    expect(getLevelUpHP(8, -5, false)).toBe(1);
+  });
+});
+
+describe('getLevelUpHP defaults', () => {
+  it('uses average HP by default', () => {
+    // hitDie = 8, conMod = 2 -> expected avg is 4 + 1 + 2 = 7
+    expect(getLevelUpHP(8, 2)).toBe(7);
   });
 });
