@@ -196,30 +196,3 @@ function showToast(text, duration) {
 /**
  * Запускает праздничную анимацию конфетти при создании или левелапе героя.
  */
-export function triggerConfetti() {
-  const container = $('#confetti-container');
-  if (!container) return;
-
-  const colors = ['#e5ba53', '#ff4d6d', '#3a86f5', '#06d6a0', '#9d4edd', '#f77f00'];
-  const particleCount = 75;
-
-  for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'confetti-particle';
-    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    particle.style.left = Math.random() * 100 + 'vw';
-    particle.style.transform = `scale(${Math.random() * 0.8 + 0.4})`;
-    
-    // Задаем случайные параметры падения
-    const duration = Math.random() * 2 + 1.5;
-    particle.style.animationDuration = duration + 's';
-    particle.style.animationDelay = Math.random() * 0.5 + 's';
-
-    container.appendChild(particle);
-
-    // Удаляем после анимации
-    setTimeout(() => {
-      particle.remove();
-    }, (duration + 0.5) * 1000);
-  }
-}

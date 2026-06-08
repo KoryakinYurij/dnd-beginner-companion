@@ -6,7 +6,6 @@ import { RACES_DATA, CLASSES_DATA, BACKGROUNDS_DATA, getModifier, getStartingHP,
 import { setState, saveCharacter, getState } from '../state.js';
 import { $, $$, escapeHtml, generateId } from '../utils.js';
 import { roll4d6DropLowest, playDiceSound } from '../dice.js';
-import { triggerConfetti } from '../app.js';
 
 // Стоимость характеристик в Point Buy
 const POINT_BUY_COSTS = {
@@ -1144,8 +1143,6 @@ function finalizeCharacter() {
   // Сохраняем в базу данных и переключаем экран
   saveCharacter(newChar);
   
-  // Праздничная анимация конфетти!
-  triggerConfetti();
 
   // Звук кубиков в честь победы
   playDiceSound();

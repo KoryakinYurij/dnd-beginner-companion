@@ -6,7 +6,6 @@ import { getState, setState, saveCharacter } from '../state.js';
 import { $, $$ } from '../utils.js';
 import { XP_TABLE, getProficiencyBonus, getLevelUpHP, getModifier } from '../rules/index.js';
 import { roll } from '../dice.js';
-import { triggerConfetti } from '../app.js';
 
 /**
  * Проверяет, достаточно ли XP для повышения уровня.
@@ -251,8 +250,6 @@ function confirmLevelUp(character, hpMethod) {
     detail: { text: `🎉 ${character.name} теперь ${updatedChar.level} уровня! (+${hpGain} HP)`, duration: 5000 }
   }));
   
-  // Запускаем конфетти!
-  triggerConfetti();
 }
 
 /**
