@@ -140,10 +140,10 @@ export function calculateDefaultAC(dexMod, armorName = '', hasShield = false) {
     const name = armorName.toLowerCase();
     
     // Легкие доспехи: Броня + DEX
-    if (name.includes('кожан') || name.includes('leather')) {
-      baseAC = 11 + dexMod;
-    } else if (name.includes('проклёпан') || name.includes('studded')) {
+    if (name.includes('проклёпан') || name.includes('studded')) {
       baseAC = 12 + dexMod;
+    } else if (name.includes('кожан') || name.includes('leather')) {
+      baseAC = 11 + dexMod;
     }
     
     // Средние доспехи: Броня + DEX (макс +2)
